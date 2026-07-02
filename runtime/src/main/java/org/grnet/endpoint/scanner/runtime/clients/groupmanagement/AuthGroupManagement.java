@@ -158,6 +158,7 @@ public class AuthGroupManagement implements GroupManagement, RoleManagement {
             var id = getGroupIdByPath(fullGroupPath);
             if (id != null) {
                 getGroupClient().deleteGroup(id);
+                LOG.infof("Group deleted: %s → ID: %s", fullGroupPath, id);
             } else {
                 LOG.warnf("Group not found for deletion: %s", fullGroupPath);
             }

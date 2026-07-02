@@ -146,7 +146,24 @@ if [ "$status" -lt 200 ] || [ "$status" -ge 300 ]; then
   exit 1
 fi
 
-echo "✅ members group created successfully"
+echo "✅ Success: members group created successfully"
+
+
+response=$(curl -s -w "\n%{http_code}" -X POST \
+  "http://keycloak:8080/realms/${REALM_NAME}/agm/account/group-admin/group/${ID}/admin?username=service-account-status.page.manage.groups" \
+  -H "Authorization: Bearer $ACCTOK" \
+  -H "Accept: application/json")
+
+status=$(echo "$response" | tail -n1)
+
+if [ "$status" -lt 200 ] || [ "$status" -ge 300 ]; then
+  echo "❌ Failed to make service account group admin. HTTP $status"
+  echo "$response"
+  exit 1
+fi
+
+echo "✅ Success: service-account-status.page.manage.groups added as group admin for status-pages"
+
 
 response=$(curl -s -w "\n%{http_code}" -X POST \
   "http://keycloak:8080/realms/${REALM_NAME}/agm/account/group-admin/group/${ID}/members" \
@@ -169,7 +186,7 @@ if [ "$status" -lt 200 ] || [ "$status" -ge 300 ]; then
   exit 1
 fi
 
-echo "✅ admin added to status-pages group successfully"
+echo "✅ Success: admin added to status-pages group successfully"
 
 
 done
