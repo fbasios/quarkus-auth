@@ -359,7 +359,7 @@ public class RoleEndpoint {
                                               example = "c242e43f-9869-4fb0-b881-631bc5746ec0",
                                               schema = @Schema(type = SchemaType.STRING)) @PathParam("id")
                                       @Valid @ValidRole String id,
-                                      SecuredEndpointPerRoleRequest request) throws io.undertow.util.BadRequestException {
+                                      SecuredEndpointPerRoleRequest request) {
 
         roleEndpointService.assignRolesToEndpointsPerRole(id,request);
         var informativeResponse = new InformativeResponse();
@@ -465,11 +465,9 @@ public class RoleEndpoint {
                     type = SchemaType.OBJECT,
                     implementation = InformativeResponse.class)))
     @SecurityRequirement(name = "Authentication")
-
     @GET
     @Path("/{id}/assigned-endpoints")
     @Produces(MediaType.APPLICATION_JSON)
-
     public Response getAssignedEndpointsPerRoleId(@Parameter(
             description = "The ID of the role.",
             required = true,

@@ -1,5 +1,7 @@
 package org.grnet.endpoint.scanner.runtime.entitlements;
 
+import java.util.Optional;
+
 public interface UserContextInterface {
 
     String getId();
@@ -8,5 +10,11 @@ public interface UserContextInterface {
 
     String getNamespace();
 
-    public String entitlementManagement();
+    String entitlementManagement();
+
+    String getParent();
+
+    Optional<String> getName();
+
+    Optional<String> getEmail();
 }

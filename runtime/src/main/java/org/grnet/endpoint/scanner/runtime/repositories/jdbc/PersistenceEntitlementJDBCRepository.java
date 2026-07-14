@@ -9,6 +9,7 @@ import org.grnet.endpoint.scanner.runtime.entities.entitlements.persistence.Sett
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class PersistenceEntitlementJDBCRepository implements PersistenceEntitlementRepository {
@@ -29,6 +30,11 @@ public class PersistenceEntitlementJDBCRepository implements PersistenceEntitlem
 
     @Override
     public <T> List<T> fetchAll(int page, int size, Class<T> clazz) {
+        throw new RuntimeException("Entitlement persistence is not supported for relational databases.");
+    }
+
+    @Override
+    public <T> List<T> fetchAll(Class<T> clazz) {
         throw new RuntimeException("Entitlement persistence is not supported for relational databases.");
     }
 
@@ -88,12 +94,32 @@ public class PersistenceEntitlementJDBCRepository implements PersistenceEntitlem
     }
 
     @Override
+    public void deleteActorEntitlementByEntitlementAndActor(String entitlementId, String actorId) {
+        throw new RuntimeException("Entitlement persistence is not supported for relational databases.");
+    }
+
+    @Override
+    public List<Actor> findAllActorsByEntitlementId(String entitlementId, int page, int size) {
+        throw new RuntimeException("Entitlement persistence is not supported for relational databases.");
+    }
+
+    @Override
+    public long countAllActorByEntitlementId(String entitlementId) {
+        throw new RuntimeException("Entitlement persistence is not supported for relational databases.");
+    }
+
+    @Override
     public Optional<Setting> findSettingByKey(APISetting key) {
         throw new RuntimeException("Entitlement persistence is not supported for relational databases.");
     }
 
     @Override
     public void saveOrUpdateSetting(APISetting key, String value) {
+        throw new RuntimeException("Entitlement persistence is not supported for relational databases.");
+    }
+
+    @Override
+    public void updateEntitlementAttributes(String id, Map<String, List<String>> attributes) {
         throw new RuntimeException("Entitlement persistence is not supported for relational databases.");
     }
 }

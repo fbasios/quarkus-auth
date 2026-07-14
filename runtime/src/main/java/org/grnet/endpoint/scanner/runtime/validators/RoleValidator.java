@@ -4,6 +4,7 @@ import io.quarkus.arc.Arc;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import io.quarkus.runtime.annotations.RegisterForReflection;
+import org.grnet.endpoint.scanner.runtime.services.OidcResourceAuthorizationService;
 import org.grnet.endpoint.scanner.runtime.services.ResourceAuthorizationService;
 import org.grnet.endpoint.scanner.runtime.validators.constraints.ValidRole;
 
@@ -21,7 +22,7 @@ public class RoleValidator implements ConstraintValidator<ValidRole, String> {
     public boolean isValid(String value, ConstraintValidatorContext context) {
 
         if (value == null) {
-            return true; // or false depending on your API rules
+            return true;
         }
 
         return resourceAuthorizationService.getAllRoles()

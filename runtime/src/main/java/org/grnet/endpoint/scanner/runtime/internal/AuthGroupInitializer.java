@@ -5,14 +5,15 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 import org.grnet.endpoint.scanner.runtime.clients.groupmanagement.AuthGroupManagement;
+import org.grnet.endpoint.scanner.runtime.services.ResourceAuthorizationService;
 
 @ApplicationScoped
 public class AuthGroupInitializer {
 
     @Inject
-    AuthGroupManagement authGroupManagement;
+    ResourceAuthorizationService resourceAuthorizationService;
 
     void onStart(@Observes StartupEvent event) {
-        //authGroupManagement.createParentGroup();
+        resourceAuthorizationService.init();
     }
 }

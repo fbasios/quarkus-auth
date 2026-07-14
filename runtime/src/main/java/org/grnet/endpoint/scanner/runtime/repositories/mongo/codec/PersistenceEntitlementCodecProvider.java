@@ -5,6 +5,7 @@ import org.bson.codecs.configuration.CodecProvider;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.grnet.endpoint.scanner.runtime.entities.EndpointResolver;
 import org.grnet.endpoint.scanner.runtime.entities.ResourceAuthorization;
+import org.grnet.endpoint.scanner.runtime.entities.RoleEndpoint;
 import org.grnet.endpoint.scanner.runtime.entities.entitlements.persistence.Actor;
 import org.grnet.endpoint.scanner.runtime.entities.entitlements.persistence.ActorEntitlements;
 import org.grnet.endpoint.scanner.runtime.entities.entitlements.persistence.Entitlement;
@@ -25,6 +26,8 @@ public class PersistenceEntitlementCodecProvider implements CodecProvider {
             return (Codec<T>) new ResourceAuthorizationCodec();
         } else if(clazz.equals(Setting.class)){
             return (Codec<T>) new SettingCodec();
+        } else if(clazz.equals(RoleEndpoint.class)){
+            return (Codec<T>) new RoleEndpointCodec();
         }
         return null;
     }

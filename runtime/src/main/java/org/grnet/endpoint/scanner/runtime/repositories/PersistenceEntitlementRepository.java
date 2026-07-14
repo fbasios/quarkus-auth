@@ -8,6 +8,7 @@ import org.grnet.endpoint.scanner.runtime.entities.entitlements.persistence.Sett
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface PersistenceEntitlementRepository {
@@ -19,6 +20,9 @@ public interface PersistenceEntitlementRepository {
     Long count(Class<?> clazz);
 
     <T> List<T> fetchAll(int page, int size, Class<T> clazz);
+
+    <T> List<T> fetchAll(Class<T> clazz);
+
 
     long countDocuments(Date start, Date end, Class<?> clazz);
 
@@ -42,7 +46,15 @@ public interface PersistenceEntitlementRepository {
 
     Optional<ActorEntitlements> findActorEntitlementByEntitlementAndActor(String entitlementId, String actorId);
 
+    void deleteActorEntitlementByEntitlementAndActor(String entitlementId, String actorId);
+
+    List<Actor> findAllActorsByEntitlementId(String entitlementId, int page, int size);
+
+    long countAllActorByEntitlementId(String entitlementId);
+
     Optional<Setting> findSettingByKey(APISetting key);
 
     void saveOrUpdateSetting(APISetting key, String value);
+
+    void updateEntitlementAttributes(String id, Map<String, List<String>> attributes);
 }

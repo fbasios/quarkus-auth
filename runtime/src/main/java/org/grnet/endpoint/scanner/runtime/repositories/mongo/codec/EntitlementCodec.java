@@ -16,6 +16,9 @@ import org.grnet.endpoint.scanner.runtime.entities.entitlements.persistence.Enti
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class EntitlementCodec implements CollectibleCodec<Entitlement> {
@@ -60,6 +63,17 @@ public class EntitlementCodec implements CollectibleCodec<Entitlement> {
         }
         entitlement.setRegisteredOn(localDateTime);
 
+        var attributesDoc = (Document) document.get("attributes");
+        if (attributesDoc != null) {
+            Map<String, List<String>> attributes = new HashMap<>();
+            for (String key : attributesDoc.keySet()) {
+                @SuppressWarnings("unchecked")
+                List<String> values = (List<String>) attributesDoc.get(key);
+                attributes.put(key, values);
+            }
+            entitlement.setAttributes(attributes);
+        }
+
         return entitlement;
     }
 
@@ -70,6 +84,7 @@ public class EntitlementCodec implements CollectibleCodec<Entitlement> {
         doc.put("_id", entitlement.getId());
         doc.put("name", entitlement.getName());
         doc.put("registered_on", entitlement.getRegisteredOn());
+        doc.put("attributes", entitlement.getAttributes());
 
         documentCodec.encode(bsonWriter, doc, encoderContext);
     }

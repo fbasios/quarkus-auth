@@ -1,19 +1,14 @@
 package org.grnet.endpoint.scanner.runtime.services;
 
 
-import io.undertow.util.BadRequestException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.grnet.endpoint.scanner.runtime.Scope;
-import org.grnet.endpoint.scanner.runtime.SecuredEndpoint;
 import org.grnet.endpoint.scanner.runtime.dtos.*;
 import org.grnet.endpoint.scanner.runtime.entities.RoleEndpoint;
 import org.grnet.endpoint.scanner.runtime.repositories.RoleEndpointRepository;
-import org.jboss.resteasy.reactive.server.util.ScoreSystem;
-;
 
-import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -24,6 +19,7 @@ public class RoleEndpointService {
     RoleEndpointRepository roleEndpointRepository;
     @Inject
     ResourceAuthorizationService resourceAuthorizationService;
+
     public RoleEndpointAssignmentResponse getAssignedEndpoints() {
 
         List<RoleEndpoint> roleEndpoints = roleEndpointRepository.findAll();
@@ -96,16 +92,6 @@ public class RoleEndpointService {
     }
 
     public RoleEndpointAssignmentResponse getAssignedEndpointsByRoleId(String roleId) {
-//        var roleResponse=resourceAuthorizationService.getAllRoles();
-//        RoleResponse role = roleResponse.stream()
-//                .filter(r -> r.id.equals(roleId))
-//                .findFirst()
-//                .orElse(null);
-//        if (role == null) {
-//            throw new NotFoundException(
-//                    String.format("Role with id %s not found", roleId)
-//            );
-//        }
 
         List<RoleEndpoint> roleEndpoints = roleEndpointRepository.findAll()
                 .stream()
@@ -224,20 +210,18 @@ public class RoleEndpointService {
     }
 
     @Transactional
-    public void assignRolesToEndpointsPerRole(
-            String roleId,
-            SecuredEndpointPerRoleRequest request
-    ) {
+    public void assignRolesToEndpointsPerRole(String roleId, SecuredEndpointPerRoleRequest request) {
 
-        RoleResponse role = resourceAuthorizationService.getAllRoles().stream()
+        RoleResponse role = resourceAuthorizationService
+                .getAllRoles()
+                .stream()
                 .filter(r -> r.id.equals(roleId))
                 .findFirst()
                 .orElseThrow(() ->
                         new RuntimeException("Role not found: " + roleId)
                 );
 
-        List<RoleEndpoint> existing =
-                roleEndpointRepository.list("role_id", roleId);
+        List<RoleEndpoint> existing = roleEndpointRepository.list("role_id", roleId);
 
         // key = endpointId:scope
         Map<String, RoleEndpoint> existingMap =

@@ -3,6 +3,7 @@ package org.grnet.endpoint.scanner.runtime.dtos;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,7 +32,7 @@ public class RoleResponse {
             description = "Optional role attributes.",
             example = "{\"preferred_name\":[\"Administrator\"],\"description\":[\"Administrative role\"]}"
     )
-    public Map<String, List<String>> attributes;
+    public Map<String, List<String>> attributes = new HashMap<>();
 
     public RoleResponse() {
     }

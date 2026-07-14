@@ -184,57 +184,6 @@ public class SecuredEndpointResource {
         return resourceAuthorizationService.findByEndpointSecuredEndpointId(id);
     }
 
-//    @Tag(name = "Secured Endpoints")
-//    @Operation(
-//            summary = "Update authorization rules for a secured endpoint.",
-//            description = "Update authorization rules for a secured endpoint."
-//    )
-//    @APIResponse(
-//            responseCode = "200",
-//            description = "Successfully updated rules.",
-//            content = @Content(schema = @Schema(
-//                    type = SchemaType.OBJECT,
-//                    implementation = Object.class)))
-//    @APIResponse(
-//            responseCode = "401",
-//            description = "User has not been authenticated.",
-//            content = @Content(schema = @Schema(
-//                    type = SchemaType.OBJECT,
-//                    implementation = Object.class)))
-//    @APIResponse(
-//            responseCode = "403",
-//            description = "Not permitted.",
-//            content = @Content(schema = @Schema(
-//                    type = SchemaType.OBJECT,
-//                    implementation = Object.class)))
-//    @APIResponse(
-//            responseCode = "409",
-//            description = "Rule already exists.",
-//            content = @Content(schema = @Schema(
-//                    type = SchemaType.OBJECT,
-//                    implementation = Object.class)))
-//    @APIResponse(
-//            responseCode = "500",
-//            description = "Internal Server Error.",
-//            content = @Content(schema = @Schema(
-//                    type = SchemaType.OBJECT,
-//                    implementation = Object.class)))
-//    @PUT
-//    @Path("/rules/{id}")
-//    @Produces(MediaType.APPLICATION_JSON)
-//    @Consumes(MediaType.APPLICATION_JSON)
-//    @SecuredEndpoint
-//    public Response updateAuthorizations(@Parameter(
-//            description = "The unique rule id.",
-//            required = true,
-//            example = "1",
-//            schema = @Schema(type = SchemaType.NUMBER)) @PathParam("id") Long ruleId,
-//            @Valid @NotNull(message = "The request body is empty.") UpdateAuthorizationRequest request) {
-//
-//        resourceAuthorizationService.updateRule(ruleId, request.rule);
-//        return Response.ok().build();
-//    }
-
     @Operation(
             summary = "Create mapping between entity fields for endpoint  in order to resolve.",
             description = "Create mapping between entity fields for endpoint in order to resolve."
@@ -293,7 +242,7 @@ public class SecuredEndpointResource {
     }
 
     @Operation(
-            summary = "Get authorization resource rules for a secured enpoint",
+            summary = "Get authorization resource rules for a secured endpoint",
             description = "CGet authorization resource rules"
     )
     @APIResponse(
@@ -572,58 +521,6 @@ public class SecuredEndpointResource {
             @PathParam("id") Long id) {
         return endpointResolverService.findById(id);
     }
-
-
-//    @Tag(name = "Secured Endpoints")
-//    @Operation(
-//            summary = "Delete authorization resource rules for a secured enpoint",
-//            description = "Delete authorization resource rules"
-//    )
-//    @APIResponse(
-//            responseCode = "200",
-//            description = "Successfully deleted rule",
-//            content = @Content(schema = @Schema(
-//                    type = SchemaType.OBJECT,
-//                    implementation = Object.class)))
-//    @APIResponse(
-//            responseCode = "401",
-//            description = "User has not been authenticated.",
-//            content = @Content(schema = @Schema(
-//                    type = SchemaType.OBJECT,
-//                    implementation = Object.class)))
-//    @APIResponse(
-//            responseCode = "403",
-//            description = "Not permitted.",
-//            content = @Content(schema = @Schema(
-//                    type = SchemaType.OBJECT,
-//                    implementation = Object.class)))
-//    @APIResponse(
-//            responseCode = "409",
-//            description = "Rule already exists.",
-//            content = @Content(schema = @Schema(
-//                    type = SchemaType.OBJECT,
-//                    implementation = Object.class)))
-//    @APIResponse(
-//            responseCode = "500",
-//            description = "Internal Server Error.",
-//            content = @Content(schema = @Schema(
-//                    type = SchemaType.OBJECT,
-//                    implementation = Object.class)))
-//    @DELETE
-//    @Path("/resource-authorizations/{id}")
-//    @Produces(MediaType.APPLICATION_JSON)
-//    @SecuredEndpoint
-//    public Response deleteAuthorization(@PathParam("id") Long id) {
-//
-//        ResourceAuthorization existing = resourceAuthorizationService.findById(id);
-//        if (existing == null) {
-//            throw new NotFoundException("ResourceAuthorization with id " + id + " not found");
-//        }
-//
-//        resourceAuthorizationService.delete(id);
-//
-//        return Response.ok(Map.of("message", "Successfully deleted")).build();
-//    }
 
     public static class PageableSecuredEndpoints extends PageResource<EndpointMetadata> {
 

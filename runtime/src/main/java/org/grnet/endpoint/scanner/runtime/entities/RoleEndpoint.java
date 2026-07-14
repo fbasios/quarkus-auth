@@ -8,7 +8,6 @@ public class RoleEndpoint {
     private String roleName;
     private String securedEndpointId;
     private LocalDateTime createdAt;
-
     private String scope;
 
     public RoleEndpoint() {

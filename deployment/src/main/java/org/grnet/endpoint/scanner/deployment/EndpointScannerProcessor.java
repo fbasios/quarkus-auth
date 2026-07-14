@@ -2,6 +2,7 @@ package org.grnet.endpoint.scanner.deployment;
 
 import io.quarkus.agroal.spi.JdbcDataSourceBuildItem;
 import io.quarkus.arc.deployment.*;
+import io.quarkus.arc.processor.DotNames;
 import io.quarkus.deployment.annotations.BuildProducer;
 import io.quarkus.deployment.annotations.BuildStep;
 import io.quarkus.deployment.annotations.Consume;
@@ -51,6 +52,7 @@ import org.grnet.endpoint.scanner.runtime.repositories.mongo.codec.ActorEntitlem
 import org.grnet.endpoint.scanner.runtime.repositories.mongo.codec.EntitlementCodec;
 import org.grnet.endpoint.scanner.runtime.repositories.mongo.codec.PersistenceEntitlementCodecProvider;
 import org.grnet.endpoint.scanner.runtime.repositories.mongo.codec.ResourceAuthorizationCodec;
+import org.grnet.endpoint.scanner.runtime.repositories.mongo.codec.RoleEndpointCodec;
 import org.grnet.endpoint.scanner.runtime.repositories.mongo.codec.SettingCodec;
 import org.grnet.endpoint.scanner.runtime.entities.pagination.Page;
 import org.grnet.endpoint.scanner.runtime.entities.pagination.PageQuery;
@@ -303,7 +305,7 @@ class EndpointScannerProcessor {
                 AdditionalBeanBuildItem.unremovableOf(EndpointMetadataHolder.class),
                 AdditionalBeanBuildItem.unremovableOf(ApiResourceHolder.class),
                 AdditionalBeanBuildItem.unremovableOf(PersistenceEntitlementRepository.class),
-                AdditionalBeanBuildItem.unremovableOf(ResourceAuthorizationService.class),
+                AdditionalBeanBuildItem.unremovableOf(OidcResourceAuthorizationService.class),
                 AdditionalBeanBuildItem.unremovableOf(EndpointResolverService.class),
                 AdditionalBeanBuildItem.unremovableOf(GroupIdResolver.class),
                 AdditionalBeanBuildItem.unremovableOf(ResourceAuthorizationRepository.class),
@@ -433,6 +435,7 @@ class EndpointScannerProcessor {
         additionalIndexedClasses.produce(new AdditionalIndexedClassesBuildItem(ActorEntitlementsCodec.class.getName()));
         additionalIndexedClasses.produce(new AdditionalIndexedClassesBuildItem(SettingCodec.class.getName()));
         additionalIndexedClasses.produce(new AdditionalIndexedClassesBuildItem(ResourceAuthorizationCodec.class.getName()));
+        additionalIndexedClasses.produce(new AdditionalIndexedClassesBuildItem(RoleEndpointCodec.class.getName()));
         additionalIndexedClasses.produce(new AdditionalIndexedClassesBuildItem(PersistenceEntitlementCodecProvider.class.getName()));
     }
 
@@ -448,6 +451,49 @@ class EndpointScannerProcessor {
             }
         }
     }
+
+    public static class IsMongoAbsent implements BooleanSupplier {
+        @Override
+        public boolean getAsBoolean() {
+            return !new IsMongoPresent().getAsBoolean();
+        }
+    }
+
+
+    @BuildStep
+    AdditionalBeanBuildItem registerExternalSystemAuthService() {
+        return AdditionalBeanBuildItem.builder()
+                .addBeanClass(OidcResourceAuthorizationService.class)
+                .setUnremovable()
+                .build();
+    }
+
+    @BuildStep(onlyIf = IsMongoPresent.class)
+    AdditionalBeanBuildItem registerPersistenceAuthService() {
+        return AdditionalBeanBuildItem.builder()
+                .addBeanClass(PersistenceResourceAuthorizationService.class)
+                .setUnremovable()
+                .build();
+    }
+
+    @BuildStep(onlyIf = IsMongoPresent.class)
+    AdditionalBeanBuildItem registerAuthServiceWithPersistence() {
+        return AdditionalBeanBuildItem.builder()
+                .addBeanClass(ResourceAuthorizationServiceWithPersistence.class)
+                .setUnremovable()
+                .setDefaultScope(DotNames.APPLICATION_SCOPED)
+                .build();
+    }
+
+    @BuildStep(onlyIf = IsMongoAbsent.class)
+    AdditionalBeanBuildItem registerAuthServiceWithoutPersistence() {
+        return AdditionalBeanBuildItem.builder()
+                .addBeanClass(ResourceAuthorizationServiceWithoutPersistence.class)
+                .setUnremovable()
+                .setDefaultScope(DotNames.APPLICATION_SCOPED)
+                .build();
+    }
+
 
     @BuildStep
     @Consume(BeanContainerBuildItem.class)

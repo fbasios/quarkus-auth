@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -75,6 +76,14 @@ public class PersistenceEntitlementMongoRepository implements PersistenceEntitle
 
         return getCollectionByClass(clazz)
                 .aggregate(List.of(Aggregates.skip(size * (page)), Aggregates.limit(size)))
+                .into(new ArrayList<>());
+    }
+
+    @Override
+    public <T> List<T> fetchAll(Class<T> clazz) {
+
+        return getCollectionByClass(clazz)
+                .find()
                 .into(new ArrayList<>());
     }
 
@@ -134,6 +143,19 @@ public class PersistenceEntitlementMongoRepository implements PersistenceEntitle
                         set("registeredOn", LocalDateTime.now())
                 )
         );
+    }
+
+    @Override
+    public void updateEntitlementAttributes(String id, Map<String, List<String>> attributes) {
+
+        getCollectionByClass(Entitlement.class)
+                .updateOne(
+                        eq("_id", id),
+                        combine(
+                                set("attributes", attributes),
+                                set("registeredOn", LocalDateTime.now())
+                        )
+                );
     }
 
     @Override
@@ -226,6 +248,57 @@ public class PersistenceEntitlementMongoRepository implements PersistenceEntitle
         } else {
             return Optional.of(actorEntitlements);
         }
+    }
+
+    @Override
+    public void deleteActorEntitlementByEntitlementAndActor(String entitlementId, String actorId) {
+
+        getCollectionByClass(ActorEntitlements.class)
+                .deleteOne(and(eq("entitlement_id", entitlementId), eq("actor_id", actorId)));
+    }
+
+    @Override
+    public List<Actor> findAllActorsByEntitlementId(String entitlementId, int page, int size) {
+
+
+        var eq = Aggregates
+                .match(Filters.eq("entitlement_id", entitlementId));
+
+        var lookup = Aggregates.lookup("Actor", "actor_id", "_id", "actors");
+
+        var unwindDetails = Aggregates
+                .unwind("$actors");
+
+        var projection = Aggregates.project(Projections.fields(
+                Projections.computed("_id", "$actors._id"),
+                Projections.computed("registeredOn", "$actors.registered_on"),
+                Projections.computed("name", "$actors.name"),
+                Projections.computed("email", "$actors.email"),
+                Projections.computed("issuer", "$actors.issuer"),
+                Projections.computed("oidcId", "$actors.oidc_id")));
+
+        List<Document> raw = getCollectionByClass(ActorEntitlements.class)
+                .aggregate(List.of(eq, lookup, unwindDetails, projection), Document.class)
+                .into(new ArrayList<>());
+
+        raw.forEach(System.out::println);
+
+        return getCollectionByClass(ActorEntitlements.class)
+                .aggregate(List.of(eq, lookup, unwindDetails, projection, Aggregates.skip(size * (page)), Aggregates.limit(size)), Actor.class)
+                .into(new ArrayList<>());
+    }
+
+    @Override
+    public long countAllActorByEntitlementId(String entitlementId) {
+
+        var eq = Aggregates
+                .match(Filters.eq("entitlement_id", entitlementId));
+
+        var count = getCollection(ActorEntitlements.class)
+                .aggregate(List.of(eq, Aggregates.count()))
+                .first();
+
+        return count == null ? 0L : Long.parseLong(count.get("count").toString());
     }
 
     @Override
