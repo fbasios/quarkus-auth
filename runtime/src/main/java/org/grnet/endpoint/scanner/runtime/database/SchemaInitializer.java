@@ -40,10 +40,10 @@ public class SchemaInitializer {
                 try (Connection conn = ds.get().getConnection(); var reader = new InputStreamReader(Objects.requireNonNull(getClass().getResourceAsStream("/db/postgresql/init.sql")))) {
 
                     var runner = new ScriptRunner(conn);
-                    runner.setAutoCommit(false);       // use transactions
+                    runner.setAutoCommit(false);
                     runner.setStopOnError(true);
-                    runner.setSendFullScript(true);    // PostgreSQL handles full scripts well
-                    runner.setLogWriter(null);         // suppress output
+                    runner.setSendFullScript(true);
+                    runner.setLogWriter(null);
                     runner.setErrorLogWriter(null);
                     runner.runScript(reader);
                     conn.commit();
@@ -51,13 +51,33 @@ public class SchemaInitializer {
                 } catch (Exception e) {
                     throw new RuntimeException("Failed to run extension SQL script for Postgresql", e);
                 }
-            } else {
+            } else if (DatabaseKind.isMySQL(dbKind)) {
+                LOG.info("Secured Endpoints extension: Creating tables for MySql...");
+
+                try (Connection conn = ds.get().getConnection(); var reader = new InputStreamReader(Objects.requireNonNull(getClass().getResourceAsStream("/db/mysql/init.sql")))) {
+
+                    var runner = new ScriptRunner(conn);
+                    runner.setAutoCommit(false);
+                    runner.setStopOnError(true);
+                    runner.setSendFullScript(false);
+                    runner.setLogWriter(null);
+                    runner.setErrorLogWriter(null);
+                    runner.runScript(reader);
+                    conn.commit();
+
+                } catch (Exception e) {
+                    throw new RuntimeException("Failed to run extension SQL script for MySql", e);
+                }
+
+            }else {
                 throw new RuntimeException("Unsupported database kind: " + dbKind);
             }
         } else {
             LOG.info("No JDBC data source found...");
             throw new RuntimeException("No JDBC data source found...");
         }
+
+        LOG.info("Secured Endpoints extension: Database tables have been successfully created!");
     }
 
     private String generateSecuredEndpointId(EndpointMetadata endpoint) {

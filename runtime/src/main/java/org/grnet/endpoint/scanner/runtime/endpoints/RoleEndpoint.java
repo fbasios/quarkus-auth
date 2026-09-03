@@ -44,6 +44,7 @@ import static org.eclipse.microprofile.openapi.annotations.enums.ParameterIn.QUE
         bearerFormat = "JWT",
         in = SecuritySchemeIn.HEADER)
 public class RoleEndpoint {
+
     @Inject
     ResourceAuthorizationService resourceAuthorizationService;
     @Inject
@@ -292,21 +293,6 @@ public class RoleEndpoint {
         return Response.ok().entity(response).build();
     }
 
-    public static class PageableRoleResponse extends PageResource<RoleResponse> {
-
-        private List<RoleResponse> content;
-
-        @Override
-        public List<RoleResponse> getContent() {
-            return content;
-        }
-
-        @Override
-        public void setContent(List<RoleResponse> content) {
-            this.content = content;
-        }
-    }
-
     @Tag(name = "Quarkus Auth")
     @Operation(summary = "Assign secured endpoint to a specific role",
             description = "Assign secured endpoint to a specific role")
@@ -352,7 +338,6 @@ public class RoleEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @SecuredEndpoint
-
     public Response bulkAssignPerRole(@Parameter(
                                               description = "The ID of the role.",
                                               required = true,
@@ -368,7 +353,6 @@ public class RoleEndpoint {
 
         return Response.ok().entity(informativeResponse).build();
     }
-
 
     @Tag(name = "Quarkus Auth")
     @Operation(summary = "Retrieve assigned secured endpoints to roles",
@@ -410,11 +394,10 @@ public class RoleEndpoint {
                     type = SchemaType.OBJECT,
                     implementation = InformativeResponse.class)))
     @SecurityRequirement(name = "Authentication")
-
     @GET
     @Path("/assigned-endpoints")
     @Produces(MediaType.APPLICATION_JSON)
-
+    @SecuredEndpoint
     public Response getAssignedEndpointsPerRole() {
 
         RoleEndpointAssignmentResponse response =
@@ -422,8 +405,6 @@ public class RoleEndpoint {
 
         return Response.ok(response).build();
     }
-
-
 
     @Tag(name = "Quarkus Auth")
     @Operation(summary = "Retrieve assigned secured endpoint to roles",
@@ -465,11 +446,10 @@ public class RoleEndpoint {
                     type = SchemaType.OBJECT,
                     implementation = InformativeResponse.class)))
     @SecurityRequirement(name = "Authentication")
-
     @GET
     @Path("/{id}/assigned-endpoints")
     @Produces(MediaType.APPLICATION_JSON)
-
+    @SecuredEndpoint
     public Response getAssignedEndpointsPerRoleId(@Parameter(
             description = "The ID of the role.",
             required = true,
@@ -483,6 +463,20 @@ public class RoleEndpoint {
         return Response.ok(response).build();
     }
 
+    public static class PageableRoleResponse extends PageResource<RoleResponse> {
+
+        private List<RoleResponse> content;
+
+        @Override
+        public List<RoleResponse> getContent() {
+            return content;
+        }
+
+        @Override
+        public void setContent(List<RoleResponse> content) {
+            this.content = content;
+        }
+    }
 }
 
 
